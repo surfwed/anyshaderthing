@@ -71,6 +71,22 @@ float smiley(vec2 uv, vec2 p, float size)
     return mask;
 }
 
+float draw(vec2 uv, float y) {
+    if (uv.y > y) {
+        return 1.0;
+    } else {
+        return 0.0;
+    }
+}
+
+float remap01(float a, float b, float t) {
+    return (t -a ) / (b - a);
+}
+
+float remap(float a, float b, float c, float d, float t) {
+    return remap01(a, b, t) * ( d-c) + c;
+}
+
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     // Normalized pixel coordinates (from 0 to 1)
@@ -89,13 +105,18 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     mask = Band(uv.x, 0.0, 0.3, 0.01);
     float x = uv.x;
 
-    float m = sin(t + 8.0 * x) * 0.02;
-    m = 0.1 *smoothstep(0.0,0.7,sin(x+t));
-    m = (t + floor(x-t))/2.0;
+    float m = sin(10.0 * t + 8.20 * x) * 0.02;
+    // m = 0.1 *smoothstep(0.0,0.7,sin(x+t));
+    // m = (t + floor(x-t))/2.0;
     float y = uv.y - m;
+    // y = uv.x * uv.x;
 
-    float blur = 0.01;
-    mask = Rect(vec2(x, y), -0.5, 0.5, 0.0, 0.1, blur);
+
+
+    float blur = remap(-0.5, 0.5, 0.01, 0.2, x);
+    blur = 2.0 * blur;
+    mask = Rect(vec2(x, y), -0.5, 0.5, 0.0, 0.2, blur);
+    // mask = draw(uv, y);
     col = vec3(mask * bg);
 
 
